@@ -1,0 +1,6 @@
+#!/bin/bash
+DIR=`dirname $0`
+VERSION=`cat $DIR/../version`
+echo using version $VERSION
+docker login
+docker push prsephton/grokserver:$VERSION

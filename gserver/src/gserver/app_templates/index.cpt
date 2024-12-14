@@ -1,0 +1,21 @@
+<!doctype html>
+<html itemscope="itemscope" itemtype="http://schema.org/WebPage" 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xml:lang="en"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n" lang="en">
+	<head>
+		<meta content="IE=9" http-equiv="X-UA-Compatible" />
+		<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+		<meta name="viewport" content="width=device-width user-scalable=no" />
+		<base tal:attributes="href python:view.url(context, '')" />
+		<title tal:content="context.title | context.description | string:Untitled" />
+	</head>
+	<body i18n:domain="sample.com">
+	  <h1>Congratulations!</h1>
+		<p>Your Grok application is up and running.
+     		Edit <code>gserver/app_templates/index.pt</code> to change
+      		this page.</p>
+      		<img tal:attributes="src static['evencaveman.jpg']"/>
+	</body>
+</html>

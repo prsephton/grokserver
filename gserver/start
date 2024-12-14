@@ -1,0 +1,20 @@
+#!/bin/bash
+
+function terminate() {
+	kill -TERM $(jobs -p)
+	echo "Server is down"
+}
+
+trap terminate SIGTERM SIGINT SIGKILL
+
+PTH=$(dirname "$0")
+case "$1" in
+	"debug" )
+		pipenv run buildout
+		$PTH/bin/paster serve --reload $PTH/parts/etc/debug.ini & ;;
+	"deploy" )
+		$PTH/bin/paster serve $PTH/parts/etc/deploy.ini & ;;
+	* )
+		echo "Please provide one of [ debug / deploy ] as an argument to run" ;;
+esac
+wait $(jobs -p)

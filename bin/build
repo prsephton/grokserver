@@ -1,0 +1,6 @@
+#!/bin/bash
+DIR=`dirname $0`
+VERSION=`cat $DIR/../version`
+echo using version $VERSION
+cd $DIR/../gserver
+docker build -t prsephton/grokserver:$VERSION .
