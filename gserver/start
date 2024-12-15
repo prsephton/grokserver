@@ -9,12 +9,15 @@ trap terminate SIGTERM SIGINT SIGKILL
 
 PTH=$(dirname "$0")
 case "$1" in
+	"buildout" )
+		bin/buildout ;;
 	"debug" )
-		pipenv run buildout
+		echo "Starting server in development mode"
 		$PTH/bin/paster serve --reload $PTH/parts/etc/debug.ini & ;;
 	"deploy" )
+		echo "Starting server in production mode"
 		$PTH/bin/paster serve $PTH/parts/etc/deploy.ini & ;;
 	* )
-		echo "Please provide one of [ debug / deploy ] as an argument to run" ;;
+		echo "Please provide one of [ buildout/ debug / deploy ] as an argument to run" ;;
 esac
 wait $(jobs -p)

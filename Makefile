@@ -3,15 +3,18 @@
 ##	help     		- This text
 ##	build     		- Build the container image
 ##	deploy    		- Deploy (push) the container to docker hub
-##	debug			- Run the container in debug mode
+##	develop			- Run the container in development mode
 ##	production		- Run the container in production mode
-##	clean			- Remove the runtime (persistent store)
+##	buildout		- Run the internal grok installer/configuration (buildout) 
+##	runtime    		- Creates a persistent server runtime environment
+##	clean			- Remove the runtime (destroys persistent store and database)
 ##------------------------------------------------------------------------------------------
 
 help:
 	sed -ne '/@sed/!s/^##//p' $(MAKEFILE_LIST)
 
 areyousure:
+	@echo "This will remove the persistent database and all runtime files for the server (including the source)."
 	@( read -p "Are you sure? [Y/N]: " rsp && case "$$rsp" in [yY]) true;; *) false;; esac )
 
 build:
@@ -20,11 +23,17 @@ build:
 deploy:
 	bin/deploy
 
-debug:
+runtime:
+	bin/runtime
+
+develop: runtime
 	bin/run debug
 
-production:
+production: runtime
 	bin/run deploy
+
+buildout:
+	bin/buildout
 
 clean: runtime areyousure
 	rm -rf runtime

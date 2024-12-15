@@ -1,0 +1,25 @@
+#!/bin/bash
+
+DIR=`dirname $(realpath $0)`
+
+function running() {
+	docker ps | grep 'gserver$'
+}
+
+if running ; then
+	docker exec gserver pipenv run buildout
+else
+	$DIR/run production &
+	while ! running; do
+		sleep 1
+	done
+	docker exec gserver pipenv run buildout
+	docker stop gserver
+    JOBS=`jobs -p`
+    if [ -n "$JOBS" ]; then
+        kill -TERM $JOBS
+        wait $JOBS 
+    fi
+fi
+
+exit 0

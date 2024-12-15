@@ -1,3 +1,6 @@
+# Do not add runtime files, these are re-created from the container
+runtime/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

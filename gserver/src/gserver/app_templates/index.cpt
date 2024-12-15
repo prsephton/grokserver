@@ -5,11 +5,12 @@
     xmlns:tal="http://xml.zope.org/namespaces/tal"
     xmlns:i18n="http://xml.zope.org/namespaces/i18n" lang="en">
 	<head>
+		<title tal:content="context.title | context.description | string:Untitled" />
 		<meta content="IE=9" http-equiv="X-UA-Compatible" />
 		<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
 		<meta name="viewport" content="width=device-width user-scalable=no" />
 		<base tal:attributes="href python:view.url(context, '')" />
-		<title tal:content="context.title | context.description | string:Untitled" />
+		<link tal:attributes="rel string:icon; type string:image/x-icon; href static['favicon.ico']" />
 	</head>
 	<body i18n:domain="sample.com">
 	  <h1>Congratulations!</h1>

@@ -1,0 +1,32 @@
+#!/bin/bash
+DIR=`dirname $(realpath $0)`
+VERSION=`cat $DIR/../version`
+echo using version grokserver:$VERSION
+ODIR=`pwd`
+cd $DIR/..
+mkdir -p runtime && cd runtime
+if [ ! -d "var" -o ! -d "parts" ]; then 
+    docker run --rm --name gserver prsephton/grokserver:$VERSION deploy > /dev/null 2>&1 &
+    sleep 4
+    read -p "Please enter a user name for the admin account: " username
+    read -p "Please enter the password for the admin account: " password
+    
+    docker cp $DIR/ssha_gen_auth.py gserver:/opt/gserver/bin/
+    docker exec -e PYTHONPATH=./eggs/PasteScript-3.6.0-py3.13.egg gserver bin/python-console bin/ssha_gen_auth.py -u "$username" -p "$password"
+    
+    docker cp gserver:/opt/gserver/var var 
+    docker cp gserver:/opt/gserver/parts parts 
+    docker cp gserver:/opt/gserver/src src 
+    docker cp gserver:/opt/gserver/extends-cache extends-cache 
+    docker cp gserver:/opt/gserver/setup.py setup.py 
+    docker cp gserver:/opt/gserver/buildout.cfg buildout.cfg 
+    
+    docker stop gserver
+    JOBS=`jobs -p`
+    if [ -n "$JOBS" ]; then
+        kill -TERM $JOBS
+        wait $JOBS 
+    fi
+fi
+cd $ODIR
+exit 0

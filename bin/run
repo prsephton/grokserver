@@ -1,47 +1,44 @@
 #!/bin/bash
-DIR=`dirname $0`
+DIR=`dirname $(realpath $0)`
 VERSION=`cat $DIR/../version`
 echo using version $VERSION
 ODIR=`pwd`
 cd $DIR/..
 mkdir -p runtime && cd runtime
-if [ ! -d "var" -o ! -d "parts" ]; then 
-    docker run --rm --name gserver prsephton/grokserver:$VERSION deploy > /dev/null 2>&1 &
-    sleep 4
-    docker cp gserver:/opt/gserver/var var 
-    docker cp gserver:/opt/gserver/parts parts 
-    docker cp gserver:/opt/gserver/src src 
-    docker cp gserver:/opt/gserver/extends-cache extends-cache 
-    docker cp gserver:/opt/gserver/setup.py setup.py 
-    docker cp gserver:/opt/gserver/buildout.cfg buildout.cfg 
-    docker stop gserver
-    JOBS=`jobs -p`
-    if [ -n "$JOBS" ]; then
-        kill -TERM $JOBS
-        wait $JOBS 
-    fi
-fi
 uid=`id -u`
 grp=`id -g`
 develop_eggs=$( awk '/eggs-directory/ {print($3)}' ~/.buildout/default.cfg )
 if [ "$1" == "debug" ]; then
-  docker run --rm --name gserver \
-	-p 8080:8080 \
-  	-v ./var:/opt/gserver/var \
-	-v ./parts:/opt/gserver/parts \
-	-v ./src:/opt/gserver/src \
-	-v ./setup.py:/opt/gserver/setup.py \
-	-v ./buildout.cfg:/opt/gserver/buildout.cfg \
-	-v ./extends-cache:/opt/gserver/extends-cache \
-	-v $develop_eggs:/opt/gserver/develop-eggs \
-	prsephton/grokserver:$VERSION debug
+	if [ -z "$develop_eggs" ]; then
+		docker run --rm --name gserver \
+			-p 8080:8080 \
+		  	-v ./var:/opt/gserver/var \
+			-v ./parts:/opt/gserver/parts \
+			-v ./src:/opt/gserver/src \
+			-v ./setup.py:/opt/gserver/setup.py \
+			-v ./buildout.cfg:/opt/gserver/buildout.cfg \
+			-v ./extends-cache:/opt/gserver/extends-cache \
+			prsephton/grokserver:$VERSION debug
+	else
+		docker run --rm --name gserver \
+			-p 8080:8080 \
+		  	-v ./var:/opt/gserver/var \
+			-v ./parts:/opt/gserver/parts \
+			-v ./src:/opt/gserver/src \
+			-v ./setup.py:/opt/gserver/setup.py \
+			-v ./buildout.cfg:/opt/gserver/buildout.cfg \
+			-v ./extends-cache:/opt/gserver/extends-cache \
+			-v $develop_eggs:/opt/gserver/develop-eggs \
+			prsephton/grokserver:$VERSION debug
+	fi
 else
   docker run --rm --network host --name gserver \
 	-p 8080:8080 \
   	-v ./var:/opt/gserver/var \
 	-v ./parts:/opt/gserver/parts \
+	prsephton/grokserver:$VERSION deploy
 	-v ./src:/opt/gserver/src \
 	-v ./setup.py:/opt/gserver/setup.py \
-	prsephton/grokserver:$VERSION deploy
 fi
 cd $ODIR
+exit 0

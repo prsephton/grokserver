@@ -4,4 +4,4 @@ library = Library('gserver', 'static')
 
 style = Resource(library, 'style.css')
 
-favicon    = Resource(library, 'favicon.ico')
+favicon = Resource(library, 'favicon.ico')
