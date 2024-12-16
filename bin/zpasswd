@@ -7,13 +7,13 @@ function running() {
 }
 
 if running ; then
-	docker exec gserver pipenv run buildout
+	docker exec -it gserver /opt/gserver/bin/zpasswd
 else
 	$DIR/run production &
 	while ! running; do
 		sleep 1
 	done
-	docker exec gserver pipenv run buildout
+	docker exec -it gserver /opt/gserver/bin/zpasswd
 	docker stop gserver
     JOBS=`jobs -p`
     if [ -n "$JOBS" ]; then

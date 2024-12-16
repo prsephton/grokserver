@@ -1,9 +1,9 @@
 import codecs
 import os
+import stat
 import sys
 import optparse
 from base64 import urlsafe_b64encode
-from paste.script.copydir import substitute_content
 
 try:
     from hashlib import sha1
@@ -25,11 +25,6 @@ def get_ssha_encoded_string(password):
 def main():
     usage = "usage: %prog [options]"
     parser = optparse.OptionParser(usage=usage)
-    # parser.add_option(
-    #     '--svn-repository', dest="repos", default=None, help=(
-    #     "Import project to given repository location (this "
-    #     "will also create the standard trunk/ tags/ branches/ "
-    #     "hierarchy)."))
     parser.add_option(
         '-u', '--user', dest="username",  default=None, help=("Provide a user name for the master account"))    
     parser.add_option(
@@ -40,21 +35,16 @@ def main():
         parser.print_help()
         return 1
 
-    username = f'"{options.username}"'
-    password = f'"{get_ssha_encoded_string(options.password).decode()}"'
+    password = get_ssha_encoded_string(options.password).decode()
     
-    source = "/opt/gserver/etc/site.zcml.in_tmpl"
-    with open(source, "r") as f:
-        target = source.replace("_tmpl", "")
-        content = f.read()
-        content = substitute_content(content, {'username':username, 'password':password}, filename=target)
-    with open(target, "w") as o:
-        o.write(content)
-    parts_target = "/opt/gserver/parts/etc/site.zcml"
-    with open(parts_target, "w") as o:
-        o.write(content)
-        
+    pwfile = '/opt/gserver/var/.gpasswd.cfg'
+    with open(pwfile, "w") as f:
+        f.write('[site_zcml]\n')
+        f.write(f'username = "{options.username}"\n')
+        f.write(f'password = "{password}"\n')
+    os.chmod(pwfile, stat.S_IRUSR | stat.S_IWUSR)
+    
+    print(f"Manager account details updated in {pwfile}")
 
 if __name__ == "__main__":
     main()
-

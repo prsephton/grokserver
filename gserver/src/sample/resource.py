@@ -1,6 +1,6 @@
 from fanstatic import Library, Resource
 
-library = Library('gserver', 'static')
+library = Library('sample', 'static')
 
 style = Resource(library, 'style.css')
 

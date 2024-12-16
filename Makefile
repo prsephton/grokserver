@@ -7,6 +7,7 @@
 ##	production		- Run the container in production mode
 ##	buildout		- Run the internal grok installer/configuration (buildout) 
 ##	runtime    		- Creates a persistent server runtime environment
+##	password    	- Prompts for user information, and generates xml that describes a user
 ##	clean			- Remove the runtime (destroys persistent store and database)
 ##------------------------------------------------------------------------------------------
 
@@ -35,5 +36,8 @@ production: runtime
 buildout:
 	bin/buildout
 
-clean: runtime areyousure
+password:
+	bin/zpasswd
+
+clean: areyousure
 	rm -rf runtime

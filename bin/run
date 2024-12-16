@@ -18,6 +18,7 @@ if [ "$1" == "debug" ]; then
 			-v ./setup.py:/opt/gserver/setup.py \
 			-v ./buildout.cfg:/opt/gserver/buildout.cfg \
 			-v ./extends-cache:/opt/gserver/extends-cache \
+			-v $DIR/../grokwiki:/opt/gserver/grokwiki \
 			prsephton/grokserver:$VERSION debug
 	else
 		docker run --rm --name gserver \
@@ -28,6 +29,7 @@ if [ "$1" == "debug" ]; then
 			-v ./setup.py:/opt/gserver/setup.py \
 			-v ./buildout.cfg:/opt/gserver/buildout.cfg \
 			-v ./extends-cache:/opt/gserver/extends-cache \
+			-v $DIR/../grokwiki:/opt/gserver/grokwiki \
 			-v $develop_eggs:/opt/gserver/develop-eggs \
 			prsephton/grokserver:$VERSION debug
 	fi
@@ -36,9 +38,10 @@ else
 	-p 8080:8080 \
   	-v ./var:/opt/gserver/var \
 	-v ./parts:/opt/gserver/parts \
-	prsephton/grokserver:$VERSION deploy
 	-v ./src:/opt/gserver/src \
 	-v ./setup.py:/opt/gserver/setup.py \
+	-v ./buildout.cfg:/opt/gserver/buildout.cfg \
+	prsephton/grokserver:$VERSION deploy
 fi
 cd $ODIR
 exit 0

@@ -15,7 +15,7 @@
 	<body i18n:domain="sample.com">
 	  <h1>Congratulations!</h1>
 		<p>Your Grok application is up and running.
-     		Edit <code>gserver/app_templates/index.pt</code> to change
+     		Edit <code>sample/app_templates/index.pt</code> to change
       		this page.</p>
       		<img tal:attributes="src static['evencaveman.jpg']"/>
 	</body>

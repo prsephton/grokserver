@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 version = '0.0'
 
-setup(name='gserver',
+setup(name='sample',
       version=version,
       description="",
       long_description="""\
@@ -28,7 +28,7 @@ setup(name='gserver',
                         # Add extra requirements here
                         ],
       entry_points={
-          'fanstatic.libraries': [
-              'gserver = gserver.resource:library',
-          ]
+        'fanstatic.libraries': [
+            'sample = sample.resource:library',
+        ]
       })

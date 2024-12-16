@@ -1,7 +1,7 @@
 import grok
-from gserver import resource
+from sample import resource
 
-class App(grok.Application, grok.Container):
+class Sample(grok.Application, grok.Container):
     title = "Sample App"
     description = "A sample application"
 

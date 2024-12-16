@@ -4,29 +4,65 @@ VERSION=`cat $DIR/../version`
 echo using version grokserver:$VERSION
 ODIR=`pwd`
 cd $DIR/..
-mkdir -p runtime && cd runtime
-if [ ! -d "var" -o ! -d "parts" ]; then 
+
+function running() {
+	docker ps | grep 'gserver$' > /dev/null 2>&1
+}
+
+function prep_container() {
+	if running; then
+		echo "stopping running container"
+		docker stop gserver
+	fi 
     docker run --rm --name gserver prsephton/grokserver:$VERSION deploy > /dev/null 2>&1 &
-    sleep 4
-    read -p "Please enter a user name for the admin account: " username
-    read -p "Please enter the password for the admin account: " password
-    
-    docker cp $DIR/ssha_gen_auth.py gserver:/opt/gserver/bin/
-    docker exec -e PYTHONPATH=./eggs/PasteScript-3.6.0-py3.13.egg gserver bin/python-console bin/ssha_gen_auth.py -u "$username" -p "$password"
-    
-    docker cp gserver:/opt/gserver/var var 
-    docker cp gserver:/opt/gserver/parts parts 
-    docker cp gserver:/opt/gserver/src src 
-    docker cp gserver:/opt/gserver/extends-cache extends-cache 
-    docker cp gserver:/opt/gserver/setup.py setup.py 
-    docker cp gserver:/opt/gserver/buildout.cfg buildout.cfg 
-    
+    if [ ! "$?" ]; then
+    	echo "Container background execution failed"
+    	exit 1
+    fi
+    while ! running; do
+    	sleep 1
+    done	
+}
+
+function stop_container() {
     docker stop gserver
     JOBS=`jobs -p`
     if [ -n "$JOBS" ]; then
         kill -TERM $JOBS
         wait $JOBS 
+    fi	
+}
+
+mkdir -p runtime && cd runtime
+if [ ! -d "var" -o ! -d "parts" ]; then 
+    if ! prep_container; then
+    	exit 0
     fi
+    read -p "Please enter a user name for the admin account: " username
+    read -p "Please enter the password for the admin account: " password
+    
+    docker cp $DIR/ssha_gen_auth.py gserver:/opt/gserver/bin/
+    docker exec gserver bin/python-console bin/ssha_gen_auth.py -u "$username" -p "$password"
+    echo "Running Buildout..."
+	$DIR/buildout
+    
+    echo "Creating runtime..."
+    docker cp gserver:/opt/gserver/var var 
+    docker cp gserver:/opt/gserver/parts parts 
+    docker cp gserver:/opt/gserver/src src 
+    docker cp gserver:/opt/gserver/extends-cache extends-cache 
+    docker cp gserver:/opt/gserver/setup.py setup.py 
+    docker cp gserver:/opt/gserver/buildout.cfg buildout.cfg     
+
+	stop_container    
+elif [ ! -f "parts/etc/site.zcml" ]; then 
+    if ! prep_container; then
+    	exit 0
+    fi
+    docker cp gserver:/opt/gserver/parts/etc/site.zcml parts/etc/site.zcml 	
+	stop_container
+    echo "Running Buildout..."
+	$DIR/buildout
 fi
 cd $ODIR
 exit 0
