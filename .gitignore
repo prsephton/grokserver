@@ -1,5 +1,7 @@
 # Do not add runtime files, these are re-created from the container
 runtime/
+.project
+.pydevproject
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
