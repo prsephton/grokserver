@@ -15,7 +15,7 @@ help:
 	sed -ne '/@sed/!s/^##//p' $(MAKEFILE_LIST)
 
 areyousure:
-	@echo "This will remove the persistent database and all runtime files for the server (including the source)."
+	@echo "This will remove the persistent database and all runtime files for the server."
 	@( read -p "Are you sure? [Y/N]: " rsp && case "$$rsp" in [yY]) true;; *) false;; esac )
 
 build:

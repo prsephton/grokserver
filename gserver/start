@@ -10,7 +10,7 @@ trap terminate SIGTERM SIGINT SIGKILL
 PTH=$(dirname "$0")
 case "$1" in
 	"buildout" )
-		bin/buildout ;;
+		pipenv run buildout ;;
 	"debug" )
 		echo "Starting server in development mode"
 		$PTH/bin/paster serve --reload $PTH/parts/etc/debug.ini & ;;

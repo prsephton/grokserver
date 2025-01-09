@@ -35,34 +35,50 @@ function stop_container() {
 
 mkdir -p runtime && cd runtime
 if [ ! -d "var" -o ! -d "parts" ]; then 
+    T=`tempfile`
     if ! prep_container; then
     	exit 0
     fi
     read -p "Please enter a user name for the admin account: " username
     read -p "Please enter the password for the admin account: " password
+
+    if [ ! -d "../src" ]; then
+    	docker cp gserver:/opt/gserver/src ../src
+    fi   
+    ln -s ../src .
+    sitename=`basename src/*`
+    echo "Using package name [$sitename] in configuration"
     
     docker cp $DIR/ssha_gen_auth.py gserver:/opt/gserver/bin/
-    docker exec gserver bin/python-console bin/ssha_gen_auth.py -u "$username" -p "$password"
+    docker exec gserver bin/python-console bin/ssha_gen_auth.py -u "$username" -p "$password" -s "$sitename"
+    
     echo "Running Buildout..."
 	$DIR/buildout
     
     echo "Creating runtime..."
     docker cp gserver:/opt/gserver/var var 
     docker cp gserver:/opt/gserver/parts parts 
-    docker cp gserver:/opt/gserver/src src 
     docker cp gserver:/opt/gserver/extends-cache extends-cache 
-    docker cp gserver:/opt/gserver/setup.py setup.py 
-    docker cp gserver:/opt/gserver/buildout.cfg buildout.cfg     
-
-	stop_container    
+    if [ ! -f "../setup.py" ]; then
+        docker cp gserver:/opt/gserver/etc/setup.py.in $T && envsubst < $T > ../setup.py 
+	    rm $T    
+    fi
+    ln -s ../setup.py .
+    
+    if [ ! -f "../buildout.cfg" ]; then
+        docker cp gserver:/opt/gserver/etc/buildout.cfg.in $T && envsubst < $T > ../buildout.cfg     
+	    rm $T    
+    fi
+    ln -s ../buildout.cfg .
+    stop_container    
 elif [ ! -f "parts/etc/site.zcml" ]; then 
     if ! prep_container; then
     	exit 0
     fi
     docker cp gserver:/opt/gserver/parts/etc/site.zcml parts/etc/site.zcml 	
-	stop_container
+    stop_container
     echo "Running Buildout..."
-	$DIR/buildout
+    $DIR/buildout
 fi
 cd $ODIR
 exit 0

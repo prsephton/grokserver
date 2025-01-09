@@ -1,9 +1,9 @@
 <configure xmlns="http://namespaces.zope.org/zope"
-           i18n_domain="sample">
+           i18n_domain=${sitename}>
 
-  <include package="sample" />
+  <include package=${sitename} />
 
-    <configure i18n_domain="sample">
+    <configure i18n_domain=${sitename}>
 
       <unauthenticatedPrincipal id="zope.anybody"
                                 title="Unauthenticated User" />

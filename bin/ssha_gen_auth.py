@@ -29,6 +29,8 @@ def main():
         '-u', '--user', dest="username",  default=None, help=("Provide a user name for the master account"))    
     parser.add_option(
         '-p', '--password', dest="password",  default=None, help=("Provide a password for the master account"))
+    parser.add_option(
+        '-s', '--site_name', dest="sitename",  default='sample', help=("Provide a Site Name for this site"))
     
     options, args = parser.parse_args()
     if options.username is None or options.password is None:
@@ -42,9 +44,10 @@ def main():
         f.write('[site_zcml]\n')
         f.write(f'username = "{options.username}"\n')
         f.write(f'password = "{password}"\n')
+        f.write(f'sitename = "{options.sitename}"\n')
     os.chmod(pwfile, stat.S_IRUSR | stat.S_IWUSR)
     
-    print(f"Manager account details updated in {pwfile}")
+    print(f"Site configuration details updated in {pwfile}")
 
 if __name__ == "__main__":
     main()
