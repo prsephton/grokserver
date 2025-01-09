@@ -4,7 +4,7 @@
 ##	build     		- Build the container image
 ##	deploy    		- Deploy (push) the container to docker hub
 ##	develop			- Run the container in development mode
-##	production		- Run the container in production mode
+##	run				- Run the container in production mode
 ##	buildout		- Run the internal grok installer/configuration (buildout) 
 ##	runtime    		- Creates a persistent server runtime environment
 ##	password    	- Prompts for user information, and generates xml that describes a user
@@ -30,7 +30,7 @@ runtime:
 develop: runtime
 	bin/run debug
 
-production: runtime
+run: runtime
 	bin/run deploy
 
 buildout:
