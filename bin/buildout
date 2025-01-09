@@ -9,17 +9,14 @@ function running() {
 if running ; then
 	docker exec gserver pipenv run buildout
 else
-	$DIR/run production &
-	while ! running; do
-		sleep 1
-	done
-	docker exec gserver pipenv run buildout
-	docker stop gserver
-    JOBS=`jobs -p`
-    if [ -n "$JOBS" ]; then
-        kill -TERM $JOBS
-        wait $JOBS 
-    fi
+	cd $DIR/../runtime
+	docker run --rm --name gserver \
+		-v ./var:/opt/gserver/var \
+		-v ./parts:/opt/gserver/parts \
+		-v ./src:/opt/gserver/src \
+		-v ./setup.py:/opt/gserver/setup.py \
+		-v ./buildout.cfg:/opt/gserver/buildout.cfg \
+		prsephton/grokserver:1 buildout
 fi
 
 exit 0
